@@ -1,0 +1,30 @@
+{
+    "info": {
+        "name": "HideServersFromActiveNow",
+        "authors": [{
+            "name": "nibsy",
+            "discord_id": "251771217546182656",
+            "github_username": "nibsy"
+        }],
+        "version": "1.0.0",
+        "description": "Hides specific servers from the Active Now column",
+        "github": "https://github.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js",
+        "github_raw": "https://raw.githubusercontent.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js"
+    },
+    "main": "index.js",
+    "id": "",
+    
+    
+    "authorLink": "",
+    "website": "",
+    "source": "https://github.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js",
+    "patreon": "",
+    "donate": "https://paypal.me/neebsie",
+    "invite": "",
+    "changelog": [],
+    "defaultConfig": [
+        {
+            "type": ""
+        }
+    ]
+}
