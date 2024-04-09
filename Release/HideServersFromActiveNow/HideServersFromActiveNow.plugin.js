@@ -4,8 +4,8 @@
  * @version 1.0.0
  * @author nibsy
  * @authorId 251771217546182656
- * @source https://github.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js
- * @donate https://paypal.me/neebsie
+ * @website https://github.com/nibsyy/BetterDiscordPlugins/blob/main/Release/HideServersFromActiveNow/HideServersFromActiveNow.plugin.js
+ * @source https://raw.githubusercontent.com/nibsyy/BetterDiscordPlugins/main/Release/HideServersFromActiveNow/HideServersFromActiveNow.plugin.js
  */
 /*@cc_on
 @if (@_jscript)
@@ -31,21 +31,71 @@
 
 @else@*/
 const config = {
+    info: {
+        name: "HideServersFromActiveNow",
+        authors: [
+            {
+                name: "nibsy",
+                discord_id: "251771217546182656",
+                github_username: "nibsy"
+            }
+        ],
+        version: "1.0.0",
+        description: "Hides specific servers from the Active Now column",
+        github: "https://github.com/nibsyy/BetterDiscordPlugins/blob/main/Release/HideServersFromActiveNow/HideServersFromActiveNow.plugin.js",
+        github_raw: "https://raw.githubusercontent.com/nibsyy/BetterDiscordPlugins/main/Release/HideServersFromActiveNow/HideServersFromActiveNow.plugin.js"
+    },
     main: "index.js",
-    id: "",
-    name: "HideServersFromActiveNow",
-    author: "nibsy",
-    authorId: "251771217546182656",
-    authorLink: "",
-    version: "1.0.0",
-    description: "Hides specific servers from the Active Now column",
-    website: "",
-    source: "https://github.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js",
-    patreon: "",
-    donate: "https://paypal.me/neebsie",
-    invite: "",
     changelog: [],
-    defaultConfig: []
+    defaultConfig: [
+        {
+            type: "category",
+            id: "basic",
+            name: "NOTE: Plugin may have to be restarted to fully apply changes",
+            shown: true,
+            settings: []
+        },
+        {
+            type: "category",
+            id: "categoryservers",
+            name: "Servers",
+            collapsible: true,
+            shown: true,
+            settings: [
+                {
+                    type: "textbox",
+                    id: "hideservernames",
+                    name: "Server Names",
+                    note: "Names of servers to hide, separated by semicolons (;)",
+                    value: ""
+                },
+                {
+                    type: "textbox",
+                    id: "hideserverids",
+                    name: "Server IDs",
+                    note: "IDs of servers that are being hidden. DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING",
+                    value: ""
+                }
+            ]
+        },
+        {
+            type: "category",
+            id: "categorychannels",
+            name: "Channels",
+            collapsible: true,
+            shown: false,
+            settings: [
+                {
+                    type: "textbox",
+                    id: "hidechannels",
+                    name: "Channel IDs",
+                    note: "IDs of channels that are being hidden. CURRENTLY NOT WORKING",
+                    value: "",
+                    shown: false
+                }
+            ]
+        }
+    ]
 };
 class Dummy {
     constructor() {this._config = config;}
@@ -76,24 +126,39 @@ if (!global.ZeresPluginLibrary) {
  
 module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
      const plugin = (Plugin, Library) => {
-
+    const fs = require("fs");
     const {Logger} = Library;
     
     return class HideServersFromActiveNow extends Plugin {
-        
         onStart() {
-            Logger.info("Plugin enabled!");
-            this.hideVoiceChannels();
+            // Hide channels on plugin load
+            this.hideActiveNowElements();
+
+            // Hide channels when something on the list changes
+            const activeNowContainer = document.querySelector('.scroller__7c25e');
+            const observer = new MutationObserver(mutations => {
+                for (const mutation of mutations) {
+                    if (mutation.addedNodes.length > 0) {
+                        Logger.info("Change in list detected, attempting to hide new channels...");
+                        this.hideActiveNowElements();
+                        break;
+                    }
+                }
+            })
+            observer.observe(activeNowContainer, { childList: true});
         }
 
         onStop() {
-            Logger.info("Plugin disabled!");
-            this.unhideVoiceChannels();
+            this.unhideActiveNowElements();
         }
 
-        // Iterate through current voice channels, and hide if they're on the list
-        hideVoiceChannels() {
-            const serverNameToHide = "Cancer Gaming"; // Replace with the server name to hide
+        getSettingsPanel() {
+            return this.buildSettingsPanel().getElement();
+        }
+
+        // Iterate through items on the list, and hide if they have to be hidden
+        hideActiveNowElements() {
+            const serversToHide = this.settings.categoryservers.hideservernames.split(";").map(item => item.trim());
 
             // Select all voice channel elements
             const voiceChannels = document.getElementsByClassName("itemCard_b64118");
@@ -101,24 +166,26 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 const channelElement = voiceChannels[i];
                 const serverName = channelElement.querySelector(".voiceSectionDetails__00679 .voiceSectionText__406cb");
 
-                if (serverName && serverName.textContent.toUpperCase() === serverNameToHide.toUpperCase()) {
-                    // Hide the channel element
-                    channelElement.style.display = "none"; // OR channelElement.parentNode.removeChild(channelElement);\
-                    channelElement.classList.add("hidden-by-plugin");
-                    console.log("Hiding " + serverNameToHide);
-                }
+                serversToHide.forEach(serverToHide => {
+                    if (serverName && serverName.textContent.toUpperCase() === serverToHide.toUpperCase()) {
+                        // Hide the channel element
+                        channelElement.style.display = "none"; // OR channelElement.parentNode.removeChild(channelElement);\
+                        channelElement.classList.add("hidden-by-plugin");
+                        Logger.info("Hiding " + serverToHide);
+                    }
+                });
             }
         }
 
-        // Un-hide all voice channels that have been hidden
-        unhideVoiceChannels() {
+        // Un-hide everything that has been hidden
+        unhideActiveNowElements() {
             const hiddenElements = document.querySelectorAll(".hidden-by-plugin");
             for (const hiddenElement of hiddenElements) {
                 // Remove the hidden class and set display to normal
                 hiddenElement.classList.remove("hidden-by-plugin");
                 hiddenElement.style.display = "";
             }
-            console.log("Unhiding all servers");
+            Logger.info("Unhiding all servers");
         }
     };
 };

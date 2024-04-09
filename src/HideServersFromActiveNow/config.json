@@ -8,23 +8,60 @@
         }],
         "version": "1.0.0",
         "description": "Hides specific servers from the Active Now column",
-        "github": "https://github.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js",
-        "github_raw": "https://raw.githubusercontent.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js"
+        "github": "https://github.com/nibsyy/BetterDiscordPlugins/blob/main/Release/HideServersFromActiveNow/HideServersFromActiveNow.plugin.js",
+        "github_raw": "https://raw.githubusercontent.com/nibsyy/BetterDiscordPlugins/main/Release/HideServersFromActiveNow/HideServersFromActiveNow.plugin.js"
     },
     "main": "index.js",
-    "id": "",
-    
-    
-    "authorLink": "",
-    "website": "",
-    "source": "https://github.com/nibsyy/BetterDiscordPlugins/blob/main/HideServersFromActiveNow/HideServersFromActiveNow.js",
-    "patreon": "",
-    "donate": "https://paypal.me/neebsie",
-    "invite": "",
     "changelog": [],
     "defaultConfig": [
         {
-            "type": ""
+            "type": "category",
+            "id": "basic",
+            "name": "NOTE: Plugin may have to be restarted to fully apply changes",
+            "shown": true,
+            "settings": []
+        },
+        {
+            "type": "category",
+            "id": "categoryservers",
+            "name": "Servers",
+            "collapsible": true,
+            "shown": true,
+            "settings": [
+                {
+                    "type": "textbox",
+                    "id": "hideservernames",
+                    "name": "Server Names",
+                    "note": "Names of servers to hide, separated by semicolons (;)",
+                    "value": ""
+                },
+                {
+                    "type": "textbox",
+                    "id": "hideserverids",
+                    "name": "Server IDs",
+                    "note": "IDs of servers that are being hidden. DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "type": "category",
+            "id": "categorychannels",
+            "name": "Channels",
+            "collapsible": true,
+            "shown": false,
+            "settings": [
+                {
+                    "type": "textbox",
+                    "id": "hidechannels",
+                    "name": "Channel IDs",
+                    "note": "IDs of channels that are being hidden. CURRENTLY NOT WORKING",
+                    "value": "",
+                    "shown": false
+                }
+            ]
         }
+
+        
     ]
 }
